@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,6 +21,21 @@ namespace Test_Crud_Carlos_Arrieta.Controllers.Utils
 
         public async Task<tUsers> Log(string userName, string password) 
         {
+            try 
+            {
+                var user = new SqlParameter("@userName", userName);
+                var pass = new SqlParameter("@password", password);
+                var users = await _context.tUsers.FromSqlRaw("exec login @userName, @password", user, pass).ToListAsync();
+                if (users == null || users.Count == 0)
+                    return null;
+
+                return users[0];
+            }
+            catch(Exception e) 
+            {
+                return null;
+            }
+
             return null;
         } 
     }

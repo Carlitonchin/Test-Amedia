@@ -77,7 +77,10 @@ namespace Test_Crud_Carlos_Arrieta.Controllers
 
             var result = await loginController.Log(userName, password);
             if(result == null) 
-                return NotFound("error");
+            {
+                ViewBag.error = "usuario o contraseña incorrectos";
+                return View();
+            }
 
             return RedirectToAction("Index", new { codUser = result.cod_usuario });
             
