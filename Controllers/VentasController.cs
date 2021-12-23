@@ -12,9 +12,8 @@ using Test_Crud_Carlos_Arrieta.Models.ViewModels;
 
 namespace Test_Crud_Carlos_Arrieta.Controllers
 {
-    public class AlquilerController : Controller
+    public class VentasController : Controller
     {
-
         public async Task<bool> Can()
         {
             var roleController = new RoleController(_context);
@@ -31,28 +30,29 @@ namespace Test_Crud_Carlos_Arrieta.Controllers
             return true;
         }
 
+
         private readonly ApplicationDbContext _context;
 
-        public AlquilerController(ApplicationDbContext context)
+        public VentasController(ApplicationDbContext context)
         {
             _context = context;
         }
 
-        // GET: Alquiler
+        // GET: Ventas
         public async Task<IActionResult> Index()
         {
             if (!await Can())
                 return NotFound("solo admin");
 
-            return View(await _context.tPelicula.Where(p=>p.cant_disponibles_alquiler > 0).ToListAsync());
+            return View(await _context.tPelicula.Where(p => p.cant_disponibles_venta > 0).ToListAsync());
         }
 
-        public async Task<IActionResult> Alquilar(int? filmId) 
+        public async Task<IActionResult> Comprar(int? filmId) 
         {
             if (!await Can())
                 return NotFound("solo admin");
 
-            if(filmId == null) 
+            if (filmId == null)
             {
                 return NotFound();
             }
@@ -62,7 +62,7 @@ namespace Test_Crud_Carlos_Arrieta.Controllers
             if (film == null)
                 return NotFound();
 
-            if(film.cant_disponibles_alquiler == 0)
+            if (film.cant_disponibles_venta == 0)
             {
                 ViewBag.error = "No hay disponibilidad";
                 return View("Index");
@@ -71,14 +71,15 @@ namespace Test_Crud_Carlos_Arrieta.Controllers
             byte[] bytes = null;
             HttpContext.Session.TryGetValue("user", out bytes);
             int idUser = Utils.Utils.TransformBytesToInt(bytes);
-            film.cant_disponibles_alquiler--;
+            film.cant_disponibles_venta--;
             _context.tPelicula.Update(film);
-            _context.tAlquiler.Add(new tAlquiler() 
+            _context.tVenta.Add(new tVenta()
             {
                 cod_pelicula = film.cod_pelicula,
                 cod_usuario = idUser,
                 momento = DateTime.Now,
-                precio = film.precio_alquiler
+                precio = film.precio_venta
+                
             });
 
             _context.SaveChanges();
@@ -86,7 +87,7 @@ namespace Test_Crud_Carlos_Arrieta.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        public async Task<IActionResult> Devolver() 
+        public async Task<IActionResult> MisCompras() 
         {
             if (!await Can())
                 return NotFound("solo admin");
@@ -95,65 +96,17 @@ namespace Test_Crud_Carlos_Arrieta.Controllers
             HttpContext.Session.TryGetValue("user", out bytes);
             int idUser = Utils.Utils.TransformBytesToInt(bytes);
 
-            var alquileres = await _context.tAlquiler.Where(a => a.cod_usuario == idUser).ToListAsync();
-            var filmRent = (from a in alquileres
-                           join film in _context.tPelicula on
-                             a.cod_pelicula equals film.cod_pelicula
-                           select new RentFilm(film, a)).ToList();
+            var compras = await _context.tVenta.Where(a => a.cod_usuario == idUser).ToListAsync();
+            var filmBuy = (from a in compras
+                            join film in _context.tPelicula on
+                              a.cod_pelicula equals film.cod_pelicula
+                            select new BuyFilm(film, a)).ToList();
 
 
-            return View(filmRent);
+            return View(filmBuy);
         }
 
-        public async Task<IActionResult> DevolverFinal(int? rentId)
-        {
-            if (!await Can())
-                return NotFound("solo admin");
-
-            if (rentId == null)
-                return NotFound();
-
-            var rent = await _context.tAlquiler.FirstOrDefaultAsync(a => a.cod_adquiler == rentId);
-
-            if (rent == null)
-                return NotFound();
-
-            var film = await _context.tPelicula.FirstOrDefaultAsync(f => f.cod_pelicula == rent.cod_pelicula);
-
-            if(film != null)
-            {
-                film.cant_disponibles_alquiler++;
-                _context.tPelicula.Update(film);
-            }    
-
-            _context.tAlquiler.Remove(rent);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Devolver));
-
-        }
-
-        public async Task<IActionResult> Alquiladas() 
-        {
-            if (!await Can())
-                return NotFound("solo admin");
-
-            var rents = await _context.tAlquiler.ToListAsync();
-
-            var rentsUser = from ru in (from rent in rents
-                                        join user in _context.tUsers on
-                                         rent.cod_usuario equals user.cod_usuario
-                                         join film in _context.tPelicula on
-                                         rent.cod_pelicula equals film.cod_pelicula
-                                        select new RentUser(film, user, user.cod_usuario))
-                                        group ru by ru.userId into dict
-                                         select dict;
-
-            var r = rentsUser.ToList();
-            return View(r);
-                            
-        }
-
-            // GET: Alquiler/Details/5
+        // GET: Ventas/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -161,39 +114,39 @@ namespace Test_Crud_Carlos_Arrieta.Controllers
                 return NotFound();
             }
 
-            var tAlquiler = await _context.tAlquiler
-                .FirstOrDefaultAsync(m => m.cod_adquiler == id);
-            if (tAlquiler == null)
+            var tVenta = await _context.tVenta
+                .FirstOrDefaultAsync(m => m.cod_venta == id);
+            if (tVenta == null)
             {
                 return NotFound();
             }
 
-            return View(tAlquiler);
+            return View(tVenta);
         }
 
-        // GET: Alquiler/Create
+        // GET: Ventas/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: Alquiler/Create
+        // POST: Ventas/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to, for 
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("cod_adquiler,precio,momento,cod_usuario,cod_pelicula")] tAlquiler tAlquiler)
+        public async Task<IActionResult> Create([Bind("cod_venta,precio,momento,cod_usuario,cod_pelicula")] tVenta tVenta)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(tAlquiler);
+                _context.Add(tVenta);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(tAlquiler);
+            return View(tVenta);
         }
 
-        // GET: Alquiler/Edit/5
+        // GET: Ventas/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -201,22 +154,22 @@ namespace Test_Crud_Carlos_Arrieta.Controllers
                 return NotFound();
             }
 
-            var tAlquiler = await _context.tAlquiler.FindAsync(id);
-            if (tAlquiler == null)
+            var tVenta = await _context.tVenta.FindAsync(id);
+            if (tVenta == null)
             {
                 return NotFound();
             }
-            return View(tAlquiler);
+            return View(tVenta);
         }
 
-        // POST: Alquiler/Edit/5
+        // POST: Ventas/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to, for 
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("cod_adquiler,precio,momento,cod_usuario,cod_pelicula")] tAlquiler tAlquiler)
+        public async Task<IActionResult> Edit(int id, [Bind("cod_venta,precio,momento,cod_usuario,cod_pelicula")] tVenta tVenta)
         {
-            if (id != tAlquiler.cod_adquiler)
+            if (id != tVenta.cod_venta)
             {
                 return NotFound();
             }
@@ -225,12 +178,12 @@ namespace Test_Crud_Carlos_Arrieta.Controllers
             {
                 try
                 {
-                    _context.Update(tAlquiler);
+                    _context.Update(tVenta);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!tAlquilerExists(tAlquiler.cod_adquiler))
+                    if (!tVentaExists(tVenta.cod_venta))
                     {
                         return NotFound();
                     }
@@ -241,10 +194,10 @@ namespace Test_Crud_Carlos_Arrieta.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(tAlquiler);
+            return View(tVenta);
         }
 
-        // GET: Alquiler/Delete/5
+        // GET: Ventas/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -252,30 +205,30 @@ namespace Test_Crud_Carlos_Arrieta.Controllers
                 return NotFound();
             }
 
-            var tAlquiler = await _context.tAlquiler
-                .FirstOrDefaultAsync(m => m.cod_adquiler == id);
-            if (tAlquiler == null)
+            var tVenta = await _context.tVenta
+                .FirstOrDefaultAsync(m => m.cod_venta == id);
+            if (tVenta == null)
             {
                 return NotFound();
             }
 
-            return View(tAlquiler);
+            return View(tVenta);
         }
 
-        // POST: Alquiler/Delete/5
+        // POST: Ventas/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var tAlquiler = await _context.tAlquiler.FindAsync(id);
-            _context.tAlquiler.Remove(tAlquiler);
+            var tVenta = await _context.tVenta.FindAsync(id);
+            _context.tVenta.Remove(tVenta);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool tAlquilerExists(int id)
+        private bool tVentaExists(int id)
         {
-            return _context.tAlquiler.Any(e => e.cod_adquiler == id);
+            return _context.tVenta.Any(e => e.cod_venta == id);
         }
     }
 }

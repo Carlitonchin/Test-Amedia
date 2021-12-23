@@ -1,0 +1,40 @@
+﻿@model IEnumerable<Test_Crud_Carlos_Arrieta.Models.ViewModels.BuyFilm>;
+
+<h1>Peliculas compradas por usted</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Pelicula
+            </th>
+            <th>
+                Momento de la compra
+            </th>
+            <th>
+                Precio
+            </th>
+
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @item.film.txt_desc
+                </td>
+                <td>
+                    @item.buy.momento
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.buy.precio)
+                </td>
+                
+                <td>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

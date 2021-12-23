@@ -1,0 +1,46 @@
+﻿@model IEnumerable<Test_Crud_Carlos_Arrieta.Models.tPelicula>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Comprar</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.txt_desc)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.precio_venta)
+            </th>
+            <th>
+                Stock
+            </th>
+
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.txt_desc)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.precio_venta)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.cant_disponibles_venta)
+                </td>
+                <td>
+                    <a class="btn btn-primary" href="@Url.Action("Comprar", new {filmId = item.cod_pelicula })">Comprar</a>
+                </td>
+                <td>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
