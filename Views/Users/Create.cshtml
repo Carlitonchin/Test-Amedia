@@ -1,0 +1,73 @@
+﻿@model Test_Crud_Carlos_Arrieta.Models.tUsers
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create</h1>
+
+<h4>tUsers</h4>
+<hr />
+
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="txt_user" class="control-label"></label>
+                <input asp-for="txt_user" class="form-control" />
+                <span asp-validation-for="txt_user" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="txt_password" class="control-label"></label>
+                <input asp-for="txt_password" class="form-control" />
+                <span asp-validation-for="txt_password" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="txt_nombre" class="control-label"></label>
+                <input asp-for="txt_nombre" class="form-control" />
+                <span asp-validation-for="txt_nombre" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="txt_apellido" class="control-label"></label>
+                <input asp-for="txt_apellido" class="form-control" />
+                <span asp-validation-for="txt_apellido" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="nro_doc" class="control-label"></label>
+                <input asp-for="nro_doc" class="form-control" />
+                <span asp-validation-for="nro_doc" class="text-danger"></span>
+                @if (ViewBag.exist != null)
+                {
+                    <span class="text-danger">Ya existe un usuario con ese # de documento</span>
+                }
+            </div>
+            <div class="form-group">
+                <label asp-for="sn_activo" class="control-label"></label>
+                <input asp-for="sn_activo" class="form-control" />
+                <span asp-validation-for="sn_activo" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="cod_rol" class="control-label"></label>
+                <select class="form-control" name="cod_rol">
+                    @foreach (var r in ViewBag.rols)
+                    {
+                    <option value="@r.cod_rol ">@r.txt_desc</option>
+                    }
+                </select>
+                <span asp-validation-for="cod_rol" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
