@@ -1,0 +1,28 @@
+﻿<h1>Iniciar sesion</h1>
+@if (ViewBag.error != null)
+{
+    <p class="text-danger">@ViewBag.error</p>
+}
+<div class="row">
+
+
+    <div class="col-md-4">
+        <form method="post">
+            <div class="form-group">
+                <label for="userName" class="control-label">Nombre de usuario</label>
+                <input type="text" name="userName" id="userName" class="form-control" />
+                <span class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="password" class="control-label">Contraseña</label>
+                <input type="password" name="password" id="password" class="form-control" />
+                <span class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <input type="submit" value="Iniciar sesion" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>

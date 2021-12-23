@@ -17,12 +17,14 @@ namespace Test_Crud_Carlos_Arrieta.Controllers
         private readonly ILogger<HomeController> _logger;
         private readonly ApplicationDbContext _context;
         private RoleController roleController;
+        private LoginController loginController;
 
         public HomeController(ILogger<HomeController> logger, ApplicationDbContext context)
         {
             _logger = logger;
             _context = context;
             roleController = new RoleController(_context);
+            loginController = new LoginController(_context);
         }
 
         public async Task<IActionResult> Index(int? codUser)
@@ -56,6 +58,29 @@ namespace Test_Crud_Carlos_Arrieta.Controllers
             }
 
             return View();
+        }
+
+        [HttpGet]
+        public IActionResult Login() 
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Login(string userName, string password)
+        {
+            if(userName == null || password == null) 
+            {
+                ViewBag.error = "por favor ingrese usuario y contraseña";
+                return View();
+            }
+
+            var result = await loginController.Log(userName, password);
+            if(result == null) 
+                return NotFound("error");
+
+            return RedirectToAction("Index", new { codUser = result.cod_usuario });
+            
         }
 
         public IActionResult Privacy()
