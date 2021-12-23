@@ -5,24 +5,41 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Test_Crud_Carlos_Arrieta.Controllers.Utils;
 using Test_Crud_Carlos_Arrieta.Data;
 using Test_Crud_Carlos_Arrieta.Models;
+using Test_Crud_Carlos_Arrieta.Models.ViewModels;
 
 namespace Test_Crud_Carlos_Arrieta.Controllers
 {
     public class PeliculasController : Controller
     {
         private readonly ApplicationDbContext _context;
-
+        private WithoutGenre setGenre;
         public PeliculasController(ApplicationDbContext context)
         {
             _context = context;
+            setGenre = new WithoutGenre(_context);
         }
 
         // GET: Peliculas
         public async Task<IActionResult> Index()
         {
-            return View(await _context.tPelicula.ToListAsync());
+            var filmGenres = from film in _context.tPelicula
+                             join gp in _context.tGeneroPelicula on
+                             film.cod_pelicula equals gp.cod_pelicula
+                             join g in _context.tGenero on
+                             gp.cod_genero equals g.cod_genero
+                             select new FilmGenre(film, g, film.cod_pelicula);
+
+            var list = await filmGenres.ToListAsync();
+            var dicc = (from fg in list
+                        group fg by fg.filmId into newList
+                        select newList);
+
+   
+
+            return View(dicc.ToList());
         }
 
         // GET: Peliculas/Details/5
@@ -60,6 +77,7 @@ namespace Test_Crud_Carlos_Arrieta.Controllers
             {
                 _context.Add(tPelicula);
                 await _context.SaveChangesAsync();
+                await setGenre.Asign(tPelicula.cod_pelicula);
                 return RedirectToAction(nameof(Index));
             }
             return View(tPelicula);
@@ -139,9 +157,16 @@ namespace Test_Crud_Carlos_Arrieta.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var tPelicula = await _context.tPelicula.FindAsync(id);
+            /*var tPelicula = await _context.tPelicula.FindAsync(id);
             _context.tPelicula.Remove(tPelicula);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync();*/
+            try { 
+            await _context.tPelicula.FromSqlRaw("exec deleteFilm {0}", id).ToListAsync();
+            }
+            catch(Exception e) 
+            {
+                return NotFound("error");
+            }
             return RedirectToAction(nameof(Index));
         }
 

@@ -1,4 +1,4 @@
-﻿@model IEnumerable<Test_Crud_Carlos_Arrieta.Models.tPelicula>
+﻿@model IEnumerable<IGrouping<int, Test_Crud_Carlos_Arrieta.Models.ViewModels.FilmGenre>>
 
 @{
     ViewData["Title"] = "Index";
@@ -13,46 +13,65 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.txt_desc)
+                Nombre
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.cant_disponibles_alquiler)
+               Generos
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.cant_disponibles_venta)
+                Stock para Alquiler
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.precio_alquiler)
+                Stock para Venta
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.precio_venta)
+                Precio Alquiler
+            </th>
+            <th>
+                Precio Venta 
             </th>
             <th></th>
         </tr>
+        
     </thead>
     <tbody>
 @foreach (var item in Model) {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.txt_desc)
+                @Html.DisplayFor(modelItem => item.First().film.txt_desc)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.cant_disponibles_alquiler)
+                @{
+                    string genres = "";
+
+                    @foreach (var g in item)
+                    {
+                        if (g.genre.txt_desc != "Sin Genero")
+                            genres += g.genre.txt_desc + "\n";
+                    }
+                }
+
+                @genres
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.cant_disponibles_venta)
+                @Html.DisplayFor(modelItem => item.First().film.cant_disponibles_alquiler)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.precio_alquiler)
+                @Html.DisplayFor(modelItem => item.First().film.cant_disponibles_venta)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.precio_venta)
+                @Html.DisplayFor(modelItem => item.First().film.precio_alquiler)
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.cod_pelicula">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.cod_pelicula">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.cod_pelicula">Delete</a>
+                @Html.DisplayFor(modelItem => item.First().film.precio_venta)
             </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.Key">Edit</a> |
+                <a asp-action="AddGenre" asp-route-id="@item.Key">Agregar genero</a> |
+                <a asp-action="Delete" asp-route-id="@item.Key">Delete</a>
+            </td>
+
+            
         </tr>
 }
     </tbody>

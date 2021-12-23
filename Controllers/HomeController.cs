@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Test_Crud_Carlos_Arrieta.Controllers.Utils;
 using Test_Crud_Carlos_Arrieta.Data;
 using Test_Crud_Carlos_Arrieta.Models;
+using Test_Crud_Carlos_Arrieta.Models.ViewModels;
 
 namespace Test_Crud_Carlos_Arrieta.Controllers
 {
@@ -29,7 +30,10 @@ namespace Test_Crud_Carlos_Arrieta.Controllers
 
         public async Task<IActionResult> Index(int? codUser)
         {
-            if(codUser == null)
+
+            
+
+            if (codUser == null)
                 return View();
 
             try 

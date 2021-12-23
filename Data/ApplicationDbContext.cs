@@ -20,6 +20,5 @@ namespace Test_Crud_Carlos_Arrieta.Data
         public DbSet<Test_Crud_Carlos_Arrieta.Models.tPelicula> tPelicula { get; set; }
         public DbSet<Test_Crud_Carlos_Arrieta.Models.tUsers> tUsers { get; set; }
         public DbSet<Test_Crud_Carlos_Arrieta.Models.tVenta> tVenta { get; set; }
-   
     }
 }
