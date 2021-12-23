@@ -2,7 +2,7 @@
 
     <div style="display:flex; align-items:center;">
         <h1>Hola @Model.txt_user</h1>
-        <a style="margin-left:20px" href="@Url.Action("Index")" class="btn btn-danger">Cerrar sesion</a>
+        <a style="margin-left:20px" href="@Url.Action("Index", new { closeSession = 1})" class="btn btn-danger">Cerrar sesion</a>
     </div>
 
     <h6>Vista de administrador</h6>

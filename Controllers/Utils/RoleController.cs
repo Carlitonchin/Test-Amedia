@@ -9,7 +9,7 @@ using Test_Crud_Carlos_Arrieta.Models;
 
 namespace Test_Crud_Carlos_Arrieta.Controllers.Utils
 {
-    public class RoleController : Controller
+    public class RoleController : Controller, IRoleController
     {
         private readonly ApplicationDbContext _context;
 
@@ -34,6 +34,20 @@ namespace Test_Crud_Carlos_Arrieta.Controllers.Utils
             }
 
             return null;
+        }
+
+        public async Task<string> Role(int userId) 
+        {
+            try { 
+            var users = await _context.tUsers.FromSqlRaw("exec getUserById {0}", userId).ToListAsync();
+            if (users == null || users.Count == 0)
+                return null;
+
+            return await this.Role(users[0]);
+            }catch(Exception e) 
+            {
+                return null;
+            }
         }
     }
 }

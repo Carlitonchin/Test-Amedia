@@ -28,13 +28,29 @@ namespace Test_Crud_Carlos_Arrieta.Controllers
             loginController = new LoginController(_context);
         }
 
-        public async Task<IActionResult> Index(int? codUser)
+        public async Task<IActionResult> Index(int? codUser, int? closeSession)
         {
-
+            if(closeSession != null) 
+            {
+                HttpContext.Session.Remove("user");
+                return View();
+            }
             
 
-            if (codUser == null)
+            byte[] bytes = null;
+            HttpContext.Session.TryGetValue("user", out bytes);
+
+            if (bytes != null)
+                codUser = Utils.Utils.TransformBytesToInt(bytes);
+
+            if (bytes == null && codUser == null)
                 return View();
+
+            if(codUser != null && bytes == null)
+                bytes = BitConverter.GetBytes((int)codUser);
+
+            
+             HttpContext.Session.Set("user", bytes);
 
             try 
             {

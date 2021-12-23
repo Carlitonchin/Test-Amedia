@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Test_Crud_Carlos_Arrieta.Controllers.Utils;
 using Test_Crud_Carlos_Arrieta.Data;
 
 namespace Test_Crud_Carlos_Arrieta
@@ -34,6 +35,8 @@ namespace Test_Crud_Carlos_Arrieta
                 .AddEntityFrameworkStores<ApplicationDbContext>();
             services.AddControllersWithViews();
             services.AddRazorPages();
+            services.AddSession();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -54,7 +57,7 @@ namespace Test_Crud_Carlos_Arrieta
             app.UseStaticFiles();
 
             app.UseRouting();
-
+            app.UseSession();
             app.UseAuthentication();
             app.UseAuthorization();
 

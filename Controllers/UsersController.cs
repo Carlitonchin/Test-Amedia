@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Test_Crud_Carlos_Arrieta.Controllers.Utils;
 using Test_Crud_Carlos_Arrieta.Data;
 using Test_Crud_Carlos_Arrieta.Models;
 
@@ -13,8 +14,23 @@ namespace Test_Crud_Carlos_Arrieta.Controllers
 {
     public class UsersController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        public async Task<bool> Can()
+        {
+            var roleController = new RoleController(_context);
+            byte[] bytes = null;
+            HttpContext.Session.TryGetValue("user", out bytes);
+            if (bytes == null)
+                return false;
 
+            int idUser = Utils.Utils.TransformBytesToInt(bytes);
+            string role = await roleController.Role(idUser);
+            if (role == null || role != "Administrador")
+                return false;
+
+            return true;
+        }
+        private readonly ApplicationDbContext _context;
+        
         public UsersController(ApplicationDbContext context)
         {
             _context = context;
@@ -23,12 +39,16 @@ namespace Test_Crud_Carlos_Arrieta.Controllers
         // GET: Users
         public async Task<IActionResult> Index()
         {
+            if (!await Can())
+                return NotFound("Solo admin");
             return View(await _context.tUsers.ToListAsync());
         }
 
         // GET: Users/Details/5
         public async Task<IActionResult> Details(int? id)
         {
+            if (!await Can())
+                return NotFound("Solo admin");
             if (id == null)
             {
                 return NotFound();
@@ -103,6 +123,8 @@ userName, password, name, lastName, noDocument, active, rol).ToListAsync();
         // GET: Users/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
+            if (!await Can())
+                return NotFound("Solo admin");
             if (id == null)
             {
                 return NotFound();
@@ -123,6 +145,8 @@ userName, password, name, lastName, noDocument, active, rol).ToListAsync();
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("cod_usuario,txt_user,txt_password,txt_nombre,txt_apellido,nro_doc,sn_activo,cod_rol")] tUsers tUsers)
         {
+            if (!await Can())
+                return NotFound("Solo admin");
             if (id != tUsers.cod_usuario)
             {
                 return NotFound();
@@ -154,6 +178,8 @@ userName, password, name, lastName, noDocument, active, rol).ToListAsync();
         // GET: Users/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
+            if (!await Can())
+                return NotFound("Solo admin");
             if (id == null)
             {
                 return NotFound();
@@ -174,6 +200,8 @@ userName, password, name, lastName, noDocument, active, rol).ToListAsync();
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
+            if (!await Can())
+                return NotFound("Solo admin");
             var tUsers = await _context.tUsers.FindAsync(id);
             _context.tUsers.Remove(tUsers);
             await _context.SaveChangesAsync();

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Test_Crud_Carlos_Arrieta.Controllers.Utils;
 using Test_Crud_Carlos_Arrieta.Data;
 using Test_Crud_Carlos_Arrieta.Models;
 
@@ -12,8 +13,22 @@ namespace Test_Crud_Carlos_Arrieta.Controllers
 {
     public class GenerosController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        public async Task<bool> Can()
+        {
+            var roleController = new RoleController(_context);
+            byte[] bytes = null;
+            HttpContext.Session.TryGetValue("user", out bytes);
+            if (bytes == null)
+                return false;
 
+            int idUser = Utils.Utils.TransformBytesToInt(bytes);
+            string role = await roleController.Role(idUser);
+            if (role == null || role != "Administrador")
+                return false;
+
+            return true;
+        }
+        private readonly ApplicationDbContext _context;
         public GenerosController(ApplicationDbContext context)
         {
             _context = context;
@@ -22,12 +37,17 @@ namespace Test_Crud_Carlos_Arrieta.Controllers
         // GET: Generos
         public async Task<IActionResult> Index()
         {
+            if (!await Can())
+                return NotFound("Solo admin");
             return View(await _context.tGenero.ToListAsync());
         }
 
         // GET: Generos/Details/5
         public async Task<IActionResult> Details(int? id)
         {
+            if (!await Can())
+                return NotFound("Solo admin");
+
             if (id == null)
             {
                 return NotFound();
@@ -44,8 +64,11 @@ namespace Test_Crud_Carlos_Arrieta.Controllers
         }
 
         // GET: Generos/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
+            if (!await Can())
+                return NotFound("Solo admin");
+
             return View();
         }
 
@@ -56,6 +79,9 @@ namespace Test_Crud_Carlos_Arrieta.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("cod_genero,txt_desc")] tGenero tGenero)
         {
+            if (!await Can())
+                return NotFound("Solo admin");
+
             if (ModelState.IsValid)
             {
                 _context.Add(tGenero);
@@ -68,6 +94,9 @@ namespace Test_Crud_Carlos_Arrieta.Controllers
         // GET: Generos/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
+            if (!await Can())
+                return NotFound("Solo admin");
+
             if (id == null)
             {
                 return NotFound();
@@ -88,6 +117,9 @@ namespace Test_Crud_Carlos_Arrieta.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("cod_genero,txt_desc")] tGenero tGenero)
         {
+            if (!await Can())
+                return NotFound("Solo admin");
+
             if (id != tGenero.cod_genero)
             {
                 return NotFound();
@@ -119,6 +151,9 @@ namespace Test_Crud_Carlos_Arrieta.Controllers
         // GET: Generos/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
+            if (!await Can())
+                return NotFound("Solo admin");
+
             if (id == null)
             {
                 return NotFound();
@@ -139,6 +174,9 @@ namespace Test_Crud_Carlos_Arrieta.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
+            if (!await Can())
+                return NotFound("Solo admin");
+
             var tGenero = await _context.tGenero.FindAsync(id);
             _context.tGenero.Remove(tGenero);
             await _context.SaveChangesAsync();

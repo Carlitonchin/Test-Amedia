@@ -1,0 +1,32 @@
+﻿@model Test_Crud_Carlos_Arrieta.Models.ViewModels.AddGenreToFilm;
+
+<h1>Agregar genero a la pelicula @Model.film.txt_desc</h1>
+<div class="row">
+    <div class="col-md-4">
+        <form method="post">
+            <input type="hidden" name="filmId" value="@Model.film.cod_pelicula" />
+            <div class="form-group">
+                <label for="genre" class="control-label"></label>
+                <select name="genreId" class="form-control">
+                    @foreach (var item in Model.genres)
+                    {
+                        if (item.txt_desc != "Sin Genero")
+                        {
+
+                            <option value="@item.cod_genero">@item.txt_desc</option>
+                        }
+                    }
+                </select>
+                @if (ViewBag.error != null)
+                {
+                    <span class="text-danger">@ViewBag.error</span>
+                }
+
+            </div>
+
+            <div class="form-group">
+                <input type="submit" value="Agregar" class="btn btn-primary" />
+            </div>
+        </form>
+        </div>
+</div>

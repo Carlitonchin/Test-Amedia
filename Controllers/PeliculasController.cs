@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Test_Crud_Carlos_Arrieta.Controllers.Utils;
 using Test_Crud_Carlos_Arrieta.Data;
@@ -12,19 +13,42 @@ using Test_Crud_Carlos_Arrieta.Models.ViewModels;
 
 namespace Test_Crud_Carlos_Arrieta.Controllers
 {
+
     public class PeliculasController : Controller
     {
+
+        public async Task<bool> Can()
+        {
+            var roleController = new RoleController(_context);
+            byte[] bytes = null;
+            HttpContext.Session.TryGetValue("user", out bytes);
+            if (bytes == null)
+                return false;
+
+            int idUser = Utils.Utils.TransformBytesToInt(bytes);
+            string role = await roleController.Role(idUser);
+            if (role == null || role != "Administrador")
+                return false;
+
+            return true;
+        }
+
         private readonly ApplicationDbContext _context;
         private WithoutGenre setGenre;
+        
         public PeliculasController(ApplicationDbContext context)
         {
             _context = context;
             setGenre = new WithoutGenre(_context);
+            
         }
 
         // GET: Peliculas
         public async Task<IActionResult> Index()
         {
+            if (!await Can())
+                return NotFound("Solo admin");
+
             var filmGenres = from film in _context.tPelicula
                              join gp in _context.tGeneroPelicula on
                              film.cod_pelicula equals gp.cod_pelicula
@@ -45,6 +69,8 @@ namespace Test_Crud_Carlos_Arrieta.Controllers
         // GET: Peliculas/Details/5
         public async Task<IActionResult> Details(int? id)
         {
+            if (!await Can())
+                return NotFound("Solo admin");
             if (id == null)
             {
                 return NotFound();
@@ -61,8 +87,10 @@ namespace Test_Crud_Carlos_Arrieta.Controllers
         }
 
         // GET: Peliculas/Create
-        public IActionResult Create()
+        public async  Task<IActionResult> Create()
         {
+            if (!await Can())
+                return NotFound("Solo admin");
             return View();
         }
 
@@ -73,6 +101,8 @@ namespace Test_Crud_Carlos_Arrieta.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("cod_pelicula,txt_desc,cant_disponibles_alquiler,cant_disponibles_venta,precio_alquiler,precio_venta")] tPelicula tPelicula)
         {
+            if (!await Can())
+                return NotFound("Solo admin");
             if (ModelState.IsValid)
             {
                 _context.Add(tPelicula);
@@ -86,6 +116,8 @@ namespace Test_Crud_Carlos_Arrieta.Controllers
         // GET: Peliculas/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
+            if (!await Can())
+                return NotFound("Solo admin");
             if (id == null)
             {
                 return NotFound();
@@ -99,6 +131,65 @@ namespace Test_Crud_Carlos_Arrieta.Controllers
             return View(tPelicula);
         }
 
+        private async Task<IEnumerable<tGenero>> genresNotAssigned(int id) 
+        {
+            var genres = await _context.tGenero.ToListAsync();
+            var genresOfThisFilm = await _context.tGeneroPelicula.Where(g => g.cod_pelicula == id).ToListAsync();
+            var genresToAdd = genres.Where(g =>
+            genresOfThisFilm.FirstOrDefault(gf =>
+            gf.cod_genero == g.cod_genero) == null);
+
+            return genresToAdd.ToList();
+        }
+        public async Task<IActionResult> AddGenre(int? id) 
+        {
+            if (!await Can())
+                return NotFound("Solo admin");
+            if (id == null)
+                return NotFound();
+
+           
+            var film = await _context.tPelicula.FirstOrDefaultAsync(p => p.cod_pelicula == id);
+
+            if (film == null)
+                return NotFound();
+
+
+            var genresToAdd = await genresNotAssigned((int)id);
+
+            return View(new AddGenreToFilm(film, genresToAdd));
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddGenre(int? filmId, int? genreId) 
+        {
+            if (!await Can())
+                return NotFound("Solo admin");
+
+            if (filmId == null || genreId == null)
+                return NotFound();
+
+            var film = await _context.tPelicula.FirstOrDefaultAsync(p => p.cod_pelicula == filmId);
+            var genre = await _context.tGenero.FirstOrDefaultAsync(g => g.cod_genero == genreId);
+
+            if (film == null || genre == null)
+                return NotFound();
+
+            var genreFilm = await _context.tGeneroPelicula.FirstOrDefaultAsync(gf => gf.cod_genero == genreId && gf.cod_pelicula == filmId);
+            if(genreFilm != null)
+            {
+                ViewBag.error = "La pelicula " + film.txt_desc + " ya tiene el genero " + genre.txt_desc + " asignado";
+                var genresToAdd = await genresNotAssigned((int)filmId);
+                return View(new AddGenreToFilm(film, genresToAdd));
+            }
+
+            var f = new SqlParameter("@filmId", filmId);
+            var g = new SqlParameter("@genreId", genreId);
+
+            await _context.tGeneroPelicula.FromSqlRaw("exec setGenreToThisFilm @filmId, @genreId", f, g).ToListAsync();
+            return RedirectToAction(nameof(Index));
+        }
+
         // POST: Peliculas/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to, for 
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
@@ -106,6 +197,9 @@ namespace Test_Crud_Carlos_Arrieta.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("cod_pelicula,txt_desc,cant_disponibles_alquiler,cant_disponibles_venta,precio_alquiler,precio_venta")] tPelicula tPelicula)
         {
+            if (!await Can())
+                return NotFound("Solo admin");
+
             if (id != tPelicula.cod_pelicula)
             {
                 return NotFound();
@@ -137,6 +231,9 @@ namespace Test_Crud_Carlos_Arrieta.Controllers
         // GET: Peliculas/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
+            if (!await Can())
+                return NotFound("Solo admin");
+
             if (id == null)
             {
                 return NotFound();
@@ -157,6 +254,9 @@ namespace Test_Crud_Carlos_Arrieta.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
+            if (!await Can())
+                return NotFound("Solo admin");
+
             /*var tPelicula = await _context.tPelicula.FindAsync(id);
             _context.tPelicula.Remove(tPelicula);
             await _context.SaveChangesAsync();*/
