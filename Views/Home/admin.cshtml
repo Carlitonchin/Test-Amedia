@@ -8,9 +8,9 @@
     <h6>Vista de administrador</h6>
 
 
-    <a href="#" class="btn bg-secondary" style="color:white; margin:10px; width:220px; display:block">Dar de alta a usuarios</a>
     <a href="#" class="btn bg-secondary" style="color:white; margin:10px; width:220px; display:block">Dar de baja a usuarios</a>
     <a href="#" class="btn bg-secondary" style="color:white; margin:10px; width:220px; display:block">Modificar usuarios</a>
     <a href="#" class="btn bg-secondary" style="color:white; margin:10px; width:220px; display:block">Comprar Peliculas</a>
-    <a href="#" class="btn bg-secondary" style="color:white; margin:10px; width:220px; display:block">Alquilar peliculas</a>
-    <a href="#" class="btn bg-secondary" style="color:white; margin:10px; width:220px; display:block">Devolver Peliculas</a>
+    <a href="@Url.Action("Index", "Alquiler")" class="btn bg-secondary" style="color:white; margin:10px; width:220px; display:block">Alquilar peliculas</a>
+    <a href="@Url.Action("Devolver", "Alquiler")" class="btn bg-secondary" style="color:white; margin:10px; width:220px; display:block">Devolver Peliculas</a>
+    <a href="@Url.Action("Alquiladas", "Alquiler")" class="btn bg-secondary" style="color:white; margin:10px; width:220px; display:block">Peliculas no devueltas (todos los usuarios)</a>

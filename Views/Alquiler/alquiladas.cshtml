@@ -1,0 +1,14 @@
+﻿@model IEnumerable<IGrouping<int, Test_Crud_Carlos_Arrieta.Models.ViewModels.RentUser>>;
+
+@foreach (var item in Model)
+{
+     string s = ""; 
+    <h4>El usuario @item.First().user.txt_user no ha devuelto:</h4>
+    foreach (var film in item)
+    {
+        s += film.film.txt_desc + " ";
+    }
+    @s
+    <br />
+    <br />
+}

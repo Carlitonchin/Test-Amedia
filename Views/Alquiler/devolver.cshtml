@@ -1,0 +1,42 @@
+﻿@model IEnumerable< Test_Crud_Carlos_Arrieta.Models.ViewModels.RentFilm>;
+
+<h1>Peliculas alquiladas por usted</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Pelicula
+            </th>
+            <th>
+                Momento del Alquiler
+            </th>
+            <th>
+                Precio
+            </th>
+
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @item.film.txt_desc
+                </td>
+                <td>
+                    @item.rent.momento
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.rent.precio)
+                </td>
+                <td>
+                    <a class="btn btn-primary" href="@Url.Action("DevolverFinal", new {rentId = item.rent.cod_adquiler })">Devolver</a>
+                </td>
+                <td>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
