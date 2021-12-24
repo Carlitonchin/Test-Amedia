@@ -81,6 +81,11 @@ namespace Test_Crud_Carlos_Arrieta.Controllers
                 precio = film.precio_alquiler
             });
 
+            _context.alquilerPermanente.Add(new AlquilerPermanente() 
+            {
+                filmId = (int)filmId,
+                price = film.precio_alquiler
+            });
             _context.SaveChanges();
 
             return RedirectToAction(nameof(Index));

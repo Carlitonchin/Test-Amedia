@@ -82,6 +82,12 @@ namespace Test_Crud_Carlos_Arrieta.Controllers
                 
             });
 
+            _context.ventaPermanente.Add(new VentaPermanente()
+            {
+                filmId = (int)filmId,
+                price = film.precio_venta
+            }) ;
+
             _context.SaveChanges();
 
             return RedirectToAction(nameof(Index));

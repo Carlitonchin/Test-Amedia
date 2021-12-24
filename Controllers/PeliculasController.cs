@@ -66,6 +66,34 @@ namespace Test_Crud_Carlos_Arrieta.Controllers
             return View(dicc.ToList());
         }
 
+        public async Task<IActionResult> Dinero() 
+        {
+            if (!await Can())
+                return NotFound("Solo admin");
+
+            var films = from film in _context.tPelicula
+                        select new Money(film, null, null);
+
+            var afilms = await films.ToListAsync();
+
+            foreach (var item in afilms)
+            {
+                item.buy = await (from buy in _context.ventaPermanente
+                            where buy.filmId == item.film.cod_pelicula
+                            select buy)
+                            .ToListAsync();
+
+                item.rent = await (from rent in _context.alquilerPermanente
+                                   where rent.filmId == item.film.cod_pelicula
+                                   select rent)
+                                   .ToListAsync();
+            }
+
+            
+            return View(afilms);
+
+        }
+
         // GET: Peliculas/Details/5
         public async Task<IActionResult> Details(int? id)
         {

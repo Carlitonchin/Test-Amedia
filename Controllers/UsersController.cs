@@ -17,6 +17,7 @@ namespace Test_Crud_Carlos_Arrieta.Controllers
         public async Task<bool> Can()
         {
             var roleController = new RoleController(_context);
+            
             byte[] bytes = null;
             HttpContext.Session.TryGetValue("user", out bytes);
             if (bytes == null)
@@ -26,6 +27,7 @@ namespace Test_Crud_Carlos_Arrieta.Controllers
             string role = await roleController.Role(idUser);
             if (role == null || role != "Administrador")
                 return false;
+
 
             return true;
         }
@@ -37,11 +39,18 @@ namespace Test_Crud_Carlos_Arrieta.Controllers
         }
 
         // GET: Users
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string error)
         {
             if (!await Can())
                 return NotFound("Solo admin");
-            return View(await _context.tUsers.ToListAsync());
+
+            byte[] bytes = null;
+            HttpContext.Session.TryGetValue("user", out bytes);
+            int idUser = Utils.Utils.TransformBytesToInt(bytes);
+
+            if (error != null)
+                ViewBag.error = error;
+            return View(await _context.tUsers.Where(m=>m.cod_usuario != idUser).ToListAsync());
         }
 
         // GET: Users/Details/5
@@ -156,6 +165,7 @@ userName, password, name, lastName, noDocument, active, rol).ToListAsync();
             {
                 try
                 {
+                    await _context.SaveChangesAsync();
                     _context.Update(tUsers);
                     await _context.SaveChangesAsync();
                 }
@@ -202,7 +212,19 @@ userName, password, name, lastName, noDocument, active, rol).ToListAsync();
         {
             if (!await Can())
                 return NotFound("Solo admin");
+
+            bool debePeliculas = await _context.tAlquiler.FirstOrDefaultAsync(m => m.cod_usuario == id) != null;
+
+            
+
             var tUsers = await _context.tUsers.FindAsync(id);
+
+            if (debePeliculas)
+            {
+                string error = "No puedes eliminar a " + tUsers.txt_user + ", debe peliculas";
+                return RedirectToAction(nameof(Index), new { error = error });
+            }
+
             _context.tUsers.Remove(tUsers);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));

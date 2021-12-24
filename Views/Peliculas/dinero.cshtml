@@ -1,0 +1,69 @@
+﻿@model IEnumerable<Test_Crud_Carlos_Arrieta.Models.ViewModels.Money>;
+
+<h1>dinero recaudado por cada pelicula</h1>
+<br />
+<br />
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Pelicula
+            </th>
+            <th>
+                Alquilada
+            </th>
+            <th>
+                Vendida
+            </th>
+            <th>
+                Dinero de Alquiler
+            </th>
+            <th>
+                Dinero de ventas
+            </th>
+            <th>
+                Recaudacion total
+            </th>
+            <th></th>
+        </tr>
+
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+
+            decimal moneyBuy = item.buy.Sum(m => m.price);
+            decimal moneyRent = item.rent.Sum(m => m.price);
+            decimal total = moneyBuy + moneyRent;
+            int totalBuy = item.buy.Count;
+            int totalRent = item.rent.Count;
+
+            <tr>
+                <td>
+                   @item.film.txt_desc
+                </td>
+                <td>
+                    @totalRent veces
+                </td>
+                <td>
+                   @totalBuy veces
+                </td>
+                <td>
+                    @moneyRent
+                </td>
+                <td>
+                   @moneyBuy
+                </td>
+                <td>
+                    @total
+                </td>
+                <td>
+                    
+                </td>
+
+
+            </tr>
+        }
+    </tbody>
+</table>
