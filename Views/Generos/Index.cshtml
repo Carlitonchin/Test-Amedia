@@ -20,16 +20,21 @@
     </thead>
     <tbody>
 @foreach (var item in Model) {
+    
+            @if(item.txt_desc != "Sin Genero") { 
         <tr>
             <td>
+
                 @Html.DisplayFor(modelItem => item.txt_desc)
             </td>
+            
             <td>
                 <a asp-action="Edit" asp-route-id="@item.cod_genero">Edit</a> |
                 <a asp-action="Details" asp-route-id="@item.cod_genero">Details</a> |
                 <a asp-action="Delete" asp-route-id="@item.cod_genero">Delete</a>
             </td>
         </tr>
+            }
 }
     </tbody>
 </table>

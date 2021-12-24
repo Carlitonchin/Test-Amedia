@@ -144,6 +144,17 @@ userName, password, name, lastName, noDocument, active, rol).ToListAsync();
             {
                 return NotFound();
             }
+
+            var rols = _context.tRol.ToList();
+            
+            var miRol = rols.First(m => m.cod_rol == tUsers.cod_rol);
+            var otroRol = rols.First(m => m.cod_rol != tUsers.cod_rol);
+
+            ViewBag.miRolNombre = miRol.txt_desc;
+            ViewBag.miRolId = miRol.cod_rol;
+            ViewBag.otroRolNombre = otroRol.txt_desc;
+            ViewBag.otroRolId = otroRol.cod_rol;
+
             return View(tUsers);
         }
 
@@ -182,6 +193,15 @@ userName, password, name, lastName, noDocument, active, rol).ToListAsync();
                 }
                 return RedirectToAction(nameof(Index));
             }
+            var rols = _context.tRol.ToList();
+
+            var miRol = rols.First(m => m.cod_rol == tUsers.cod_rol);
+            var otroRol = rols.First(m => m.cod_rol != tUsers.cod_rol);
+
+            ViewBag.miRolNombre = miRol.txt_desc;
+            ViewBag.miRolId = miRol.cod_rol;
+            ViewBag.otroRolNombre = otroRol.txt_desc;
+            ViewBag.otroRolId = otroRol.cod_rol;
             return View(tUsers);
         }
 
@@ -201,6 +221,17 @@ userName, password, name, lastName, noDocument, active, rol).ToListAsync();
             {
                 return NotFound();
             }
+            var role = await _context.tRol.FirstOrDefaultAsync(m => m.cod_rol == tUsers.cod_rol);
+            var roles = await _context.tRol.ToListAsync();
+
+
+            ViewBag.role = role.txt_desc;
+            ViewBag.vsRole = "Visitante";
+            if (role.txt_desc == "Visitante")
+                ViewBag.vsRole = "Administrador";
+            
+            ViewBag.rolId = roles.First(m => m.txt_desc == ViewBag.role).cod_rol;
+            ViewBag.vsRolId = roles.First(m => m.txt_desc == ViewBag.vsRole).cod_rol;
 
             return View(tUsers);
         }
