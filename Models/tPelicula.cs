@@ -20,13 +20,11 @@ namespace Test_Crud_Carlos_Arrieta.Models
         [Display(Name ="Cantidad disponible para venta")]
         public int cant_disponibles_venta { get; set; }
 
-        [RegularExpression(@"^\d+(\.\d{1,2})?$")]
-        [Range(0, 9999999999999999.99)]
-        public decimal precio_alquiler { get; set; }
+        [DataType(DataType.Currency)]
+        public float precio_alquiler { get; set; }
 
-        [RegularExpression(@"^\d+(\.\d{1,2})?$")]
-        [Range(0, 9999999999999999.99)]
-        public decimal precio_venta { get; set; }
+        [DataType(DataType.Currency)]
+        public float precio_venta { get; set; }
 
         public List<tAlquiler> alquileres { get; set; }
         public List<tVenta> ventas { get; set; }

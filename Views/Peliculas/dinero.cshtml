@@ -33,9 +33,9 @@
         @foreach (var item in Model)
         {
 
-            decimal moneyBuy = item.buy.Sum(m => m.price);
-            decimal moneyRent = item.rent.Sum(m => m.price);
-            decimal total = moneyBuy + moneyRent;
+            float moneyBuy = item.buy.Sum(m => m.price);
+            float moneyRent = item.rent.Sum(m => m.price);
+            float total = moneyBuy + moneyRent;
             int totalBuy = item.buy.Count;
             int totalRent = item.rent.Count;
 

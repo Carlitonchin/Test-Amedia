@@ -12,6 +12,8 @@ namespace Test_Crud_Carlos_Arrieta.Models
         public int id { get; set; }
 
         public int filmId { get; set; }
-        public decimal price { get; set; }
+
+        [DataType(DataType.Currency)]
+        public float price { get; set; }
     }
 }

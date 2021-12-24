@@ -10,7 +10,8 @@ namespace Test_Crud_Carlos_Arrieta.Models
     {
         [Key]
         public int cod_venta { get; set; }
-        public decimal precio { get; set; }
+        [DataType(DataType.Currency)]
+        public float precio { get; set; }
         public DateTime momento { get; set; }
         public int cod_usuario { get; set; }
         public tUsers usuario { get; set; }

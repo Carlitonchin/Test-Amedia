@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Test_Crud_Carlos_Arrieta.Data;
 
 namespace Test_Crud_Carlos_Arrieta.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20211224014305_priceCurrency")]
+    partial class priceCurrency
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -229,8 +231,8 @@ namespace Test_Crud_Carlos_Arrieta.Data.Migrations
                     b.Property<int>("filmId")
                         .HasColumnType("int");
 
-                    b.Property<float>("price")
-                        .HasColumnType("real");
+                    b.Property<decimal>("price")
+                        .HasColumnType("decimal(18,2)");
 
                     b.HasKey("id");
 
@@ -247,8 +249,8 @@ namespace Test_Crud_Carlos_Arrieta.Data.Migrations
                     b.Property<int>("filmId")
                         .HasColumnType("int");
 
-                    b.Property<float>("price")
-                        .HasColumnType("real");
+                    b.Property<decimal>("price")
+                        .HasColumnType("decimal(18,2)");
 
                     b.HasKey("id");
 
@@ -274,8 +276,8 @@ namespace Test_Crud_Carlos_Arrieta.Data.Migrations
                     b.Property<int?>("peliculacod_pelicula")
                         .HasColumnType("int");
 
-                    b.Property<float>("precio")
-                        .HasColumnType("real");
+                    b.Property<decimal>("precio")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int?>("usuariocod_usuario")
                         .HasColumnType("int");
@@ -346,11 +348,11 @@ namespace Test_Crud_Carlos_Arrieta.Data.Migrations
                     b.Property<int>("cant_disponibles_venta")
                         .HasColumnType("int");
 
-                    b.Property<float>("precio_alquiler")
-                        .HasColumnType("real");
+                    b.Property<decimal>("precio_alquiler")
+                        .HasColumnType("decimal(18,2)");
 
-                    b.Property<float>("precio_venta")
-                        .HasColumnType("real");
+                    b.Property<decimal>("precio_venta")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("txt_desc")
                         .HasColumnType("nvarchar(500)")
@@ -443,8 +445,8 @@ namespace Test_Crud_Carlos_Arrieta.Data.Migrations
                     b.Property<int?>("peliculacod_pelicula")
                         .HasColumnType("int");
 
-                    b.Property<float>("precio")
-                        .HasColumnType("real");
+                    b.Property<decimal>("precio")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int?>("usuariocod_usuario")
                         .HasColumnType("int");
